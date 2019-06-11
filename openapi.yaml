@@ -5,11 +5,8 @@ info:
 
 
 servers:
-  - description: Development server
-    url: https://teleport.cheshirskycode.name/billing/charge
-
   - description: Temporary production
-    url: https://v0.api.teleport-park.com/billing/charge
+    url: https://v0.billing.cloud.teleport-park.com/charge
 
 paths:
 
