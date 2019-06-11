@@ -30,7 +30,7 @@ paths:
           description: Returns info by card_id
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AccountInfo" }
+              schema: { $ref: "#/components/schemas/AccountSummary" }
 
         404:
           description: Card not found
@@ -48,7 +48,7 @@ paths:
           description: Successful request, card transaction successfully completed
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AccountInfo" }
+              schema: { $ref: "#/components/schemas/AccountSummary" }
         400:
           description: Invalid data provided
           content:
