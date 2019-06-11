@@ -5,6 +5,33 @@ info:
 
 paths:
 
+  /info/:card_id:
+
+    parameters:
+      - name: card_id
+        in: path
+        schema:
+          type: string
+          minLength: 10
+
+    get:
+      summary: Returns info about card
+      responses:
+        200:
+          description: Returns info by card_id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  card_id: { type: string }
+                  balance: { type: number, minimum: 0 }
+        404:
+          description: Card not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
   /charge:
     post:
       summary: Request to charge card
@@ -15,6 +42,9 @@ paths:
           description: Successful request
         400:
           description: Something wrong happen
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /discharge:
     post:
@@ -26,6 +56,14 @@ paths:
           description: Successful request
         400:
           description: Something wrong happen
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        402:
+          description: Not enought founds
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
 components:
 
@@ -38,6 +76,13 @@ components:
         amount: { type: number, minimum: 0, maximum: 999 }
         currency: { type: string, enum: [ "coin" ]}
         comment: { type: string }
+
+    Error:
+      type: object
+      required: [ error ]
+      properties:
+        error: { type: string }
+        message: { type: string }
 
   requestBodies:
     AmountRequest:
@@ -53,3 +98,10 @@ components:
       description: Authenticate through bearer token in request
       type: http
       scheme: bearer
+
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
