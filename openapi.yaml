@@ -3,9 +3,17 @@ info:
   title: Charging/Discharging API
   version: 1.0.0
 
+
+servers:
+  - description: Development server
+    url: https://teleport.cheshirskycode.name/billing/charge
+
+  - description: Temporary production
+    url: https://private.teleport-park.com/billing/charge
+
 paths:
 
-  /info/:card_id:
+  /:card_id:
 
     parameters:
       - name: card_id
@@ -16,51 +24,39 @@ paths:
 
     get:
       summary: Returns info about card
+      security: [{ ApiToken: [] }]
       responses:
         200:
           description: Returns info by card_id
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  card_id: { type: string }
-                  balance: { type: number, minimum: 0 }
+              schema: { $ref: "#/components/schemas/AccountInfo" }
+
+
         404:
           description: Card not found
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
-  /charge:
-    post:
-      summary: Request to charge card
+    put:
+      summary: Charges/Discharges account by card ID
       security: [{ ApiToken: [] }]
-      requestBody: { $ref: "#/components/requestBodies/AmountRequest" }
-      responses:
-        201:
-          description: Successful request
-        400:
-          description: Something wrong happen
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
+      requestBody: { $ref: "#/components/requestBodies/ChargeRequest" }
 
-  /discharge:
-    post:
-      summary: Request to discharge card
-      security: [{ ApiToken: [] }]
-      requestBody: { $ref: "#/components/requestBodies/AmountRequest" }
       responses:
         201:
-          description: Successful request
+          description: Successful request, card transaction successfully completed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AccountInfo" }
         400:
-          description: Something wrong happen
+          description: Invalid data provided
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
-        402:
-          description: Not enought founds
+        406:
+          description: Unsuccessfull request, transaction failed
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
@@ -68,14 +64,26 @@ paths:
 components:
 
   schemas:
-    Amount:
+
+    Currency:
+      type: string
+      enum: [ "TLPVR" ]
+
+    Charge:
       type: object
-      required: [ card_id, amount, currency, comment ]
+      required: [ amount, currency, comment ]
       properties:
-        card_id: { type: string }
         amount: { type: number, minimum: 0, maximum: 999 }
-        currency: { type: string, enum: [ "coin" ]}
+        currency: { $ref: "#/components/schemas/Currency" }
         comment: { type: string }
+
+    AccountSummary:
+      type: object
+      required: [ account_id, balance ]
+      properties:
+        account_id: { type: string }
+        balance: { type: number, minimum: 0 }
+        currency: { $ref: "#/components/schemas/Currency" }
 
     Error:
       type: object
@@ -85,23 +93,16 @@ components:
         message: { type: string }
 
   requestBodies:
-    AmountRequest:
+    ChargeRequest:
       required: true
       description: Transaction request
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Amount"
+            $ref: "#/components/schemas/Charge"
 
   securitySchemes:
     ApiToken:
       description: Authenticate through bearer token in request
       type: http
       scheme: bearer
-
-  responses:
-    Error:
-      description: Error
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/Error" }
