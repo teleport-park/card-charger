@@ -9,7 +9,7 @@ servers:
     url: https://teleport.cheshirskycode.name/billing/charge
 
   - description: Temporary production
-    url: https://private.teleport-park.com/billing/charge
+    url: https://v0.api.teleport-park.com/billing/charge
 
 paths:
 
@@ -31,7 +31,6 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/AccountInfo" }
-
 
         404:
           description: Card not found
