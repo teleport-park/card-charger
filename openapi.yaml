@@ -1,0 +1,55 @@
+openapi: 3.0.0
+info:
+  title: Charging/Discharging API
+  version: 1.0.0
+
+paths:
+
+  /charge:
+    post:
+      summary: Request to charge card
+      security: [{ ApiToken: [] }]
+      requestBody: { $ref: "#/components/requestBodies/AmountRequest" }
+      responses:
+        201:
+          description: Successful request
+        400:
+          description: Something wrong happen
+
+  /discharge:
+    post:
+      summary: Request to discharge card
+      security: [{ ApiToken: [] }]
+      requestBody: { $ref: "#/components/requestBodies/AmountRequest" }
+      responses:
+        201:
+          description: Successful request
+        400:
+          description: Something wrong happen
+
+components:
+
+  schemas:
+    Amount:
+      type: object
+      required: [ card_id, amount, currency, comment ]
+      properties:
+        card_id: { type: string }
+        amount: { type: number, minimum: 0, maximum: 999 }
+        currency: { type: string, enum: [ "coin" ]}
+        comment: { type: string }
+
+  requestBodies:
+    AmountRequest:
+      required: true
+      description: Transaction request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Amount"
+
+  securitySchemes:
+    ApiToken:
+      description: Authenticate through bearer token in request
+      type: http
+      scheme: bearer
